@@ -1,0 +1,9 @@
+env
+node_modules
+migrations
+media_root
+db.sqlite3
+__pycache__
+css
+fonts
+js

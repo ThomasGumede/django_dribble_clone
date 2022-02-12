@@ -1,0 +1,114 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="grid items-center justify-center w-11/12 mx-auto space-y-14">
+    <div class="flex items-center justify-between">
+        <div class="relative py-2 px-3 text-center rounded-md border-[1px] bg-white flex items-center justify-center space-x-2">
+            <p class="text-base font-normal">Following</p>
+        </div>
+        <div class="flex items-center  space-x-5 text-base">
+            <a href="/" class="p-2 bg-[#f3f3f4] rounded-md text-center text-[#6e6d7a]">All</a>
+            {% for category in categories %}
+                <a href="{% url 'shots:shot_list_category' category=category.slug %}" class="p-2" >{{category.title}}</a>
+            {% endfor %}
+        </div>
+        <div class="relative py-2 px-3 text-center rounded-md border-[1px] bg-white flex items-center justify-center space-x-2">
+            <p class="text-base font-normal">Filter</p>
+        </div>
+    </div>
+    {% if request.user.is_authenticated and request.user.following.count == 0 %}
+        <div class="space-y-3 text-center">
+            <h1 class="text-2xl font-bold text-black">You aren't following anyone yet</h1>
+            <p><a href="" class="text-[#ea4c89]">Find friend</a> you already know from Twitter.</p>
+        </div>
+    {% endif %}
+    <div class="infinite-container grid items-center grid-cols-[repeat(4,_300px)] grid-rows-[repeat(1,_288px)] gap-8">
+        {% for content in shots %}
+            <div class="infinite-item  transition-all duration-500 delay-300">
+                <div class="relative h-60 w-full rounded-md group transition-all duration-500 delay-300">
+                    {% if content.cover_shot.name|slice:"-3:" == 'png' or content.cover_shot.name|slice:"-3:" == 'jpg' or content.cover_shot.name|slice:"-3:" == 'gif' or content.cover_shot.name|slice:"-4:" == 'jpeg' or content.cover_shot.name|slice:"-4:" == 'webp' %}
+                        <img class="w-full h-60 rounded-md object-cover" src='{{content.cover_shot.url}}' />
+                    {% else %}
+                        <video class="responsive-video" autoplay class="w-full h-60 rounded-md object-cover" preload="metadata">
+                            <source  src="{{ content.cover_shot.url }}#t=0.5" type="video/mp4">
+                        </video>
+                    {% endif %}
+                    <div class="absolute bottom-0 bg-[#000000bd] transition-all duration-500 delay-300 hidden group-hover:flex rounded-md left-0 h-16 w-full p-4  items-center justify-between">
+                        <p class="text-white font-semibold text-lg"><a href="{% url 'shots:shot_details' content.shot_uuid %}">{{content.title}}</a></p>
+                        <div class="flex items-center space-x-3">
+                            <p class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#9e9ea7] grid items-center justify-center">
+                                <i class='bx bxs-folder-plus text-lg' ></i>
+                            </p>
+                            {% if request.user.is_authenticated and request.user in content.user_like.all %}
+                                <p class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#ea4c89] grid items-center justify-center">
+                                    <i class="bx bxs-heart text-lg"></i>
+                                </p>
+                            {% else %}
+                                <p class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#9e9ea7] grid items-center justify-center">
+                                    <i class="bx bxs-heart text-lg"></i>
+                                </p>
+                            {% endif %}
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between h-11">
+                    <div class="flex items-center space-x-2">
+                        {% if content.user.photo %}
+                            <div class="h-8 w-8 rounded-full"><img class="w-full h-full rounded-full"src='{{content.user.photo.url}}' /></div>
+                        {% else %}
+                            <div class="text-center h-8 w-8 rounded-full text-base text-white bg-blue-800"></div>
+                        {% endif %}
+                        <p class="cursor-pointer"><a class="text-base text-black font-normal" href='{{content.user.username}}'>{{content.user.username}}</a></p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 text-[#9e9ea7] text-lg">
+                        {% if request.user.is_authenticated and request.user in content.user_like.all %}
+                        <p class="group cursor-pointer"><i class="bx bxs-heart text-[#ea4c89]"></i> <span>{{content.user_like.count}}</span></p>
+                        {% else %}
+                            <p class="group cursor-pointer"><i class="bx bxs-heart group-hover:text-[#ea4c89]"></i> <span>{{content.user_like.count}}</span></p>
+                        {% endif %}
+                        <p class="group cursor-pointer"><i class='bx bxs-show group-hover:text-[#ea4c89]'></i> <span>{{content.view_count}}</span></p>  
+                    </div>
+                    
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+    <div class="loading hidden">
+        Loading...
+    </div>
+    <div class="text-center">
+        {% if shots.has_next %}
+        <div>
+            <a class="infinite-more-link" href="?page={{ shots.next_page_number }}">More</a>
+        </div>
+        {% else %}
+        <div>
+            <p style="font-size: 1.2rem; ">End of list...</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block javascript %}
+  <script>
+    var infinite = new Waypoint.Infinite({
+      element: $('.infinite-container')[0],
+      onBeforePageLoad: function () {
+        $('.loading').removeClass("hidden");
+        $('.loading').addClass("block");
+      },
+      onAfterPageLoad: function ($items) {
+        $('.loading').removeClass("block");
+        $('.loading').addClass("hidden");
+      }
+    });
+
+    //Auto generate
+  </script>
+{% endblock javascript %}

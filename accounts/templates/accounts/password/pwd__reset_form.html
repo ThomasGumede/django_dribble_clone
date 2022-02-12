@@ -1,0 +1,87 @@
+{% load static %} {% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Sign In | Dribble{% endblock title %}</title>
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'css/boxicons.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+  </head>
+  <body>
+    <div class="w-full h-screen flex items-center font-sans">
+      <div class="w-2/5 bg-[#f1cdd7] h-full p-14 space-y-7">
+        <h1 class="text-[#a67e8c] text-xl font-semibold">Dribble</h1>
+
+        <p class="text-[#865c6c] text-3xl font-bold">
+          Discover the world's top Designers & Creatives.
+        </p>
+      </div>
+      <div class="relative grid items-center justify-center h-full p-6 w-3/5">
+        <div class="absolute top-0 right-0 m-7">
+          <p>
+            Not a member?
+            <a href="{% url 'accounts:signup' %}" class="text-blue-400"
+              >Sign up</a
+            >
+          </p>
+        </div>
+        <div class="space-y-5 w-[400px]">
+          <h1 class="text-black text-4xl font-bold">Reset Password</h1>
+            {% if form.errors %}
+                <div class="space-y-2">
+                    {% for field in form %}
+                        {% if field.errors %}<li class="text-sm text-red-500 font-normal">{{ field.errors|striptags }}</li>{% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="space-y-4">
+                    <p>
+                    Enter the email address you used when you joined and we'll send
+                    you instructions to reset your password.
+                    </p>
+                    <p>
+                        For security reasons, we do NOT store your password. So rest assured that we will never send your password via email.
+                    </p>
+                </div>
+            {% endif %}
+          
+
+          <div>
+            <form method="post" class="space-y-4">
+              {% csrf_token %}
+              <div class="grid space-y-2">
+                <label
+                  for="reset_form_email"
+                  class="text-black font-semibold text-base"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  name="email"
+                  id="reset_form_email"
+                  class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md"
+                  maxlength="254"
+                  required=""
+                />
+              </div>
+              
+              <div
+                class="text-center h-12 px-3 bg-[#ea4c89] w-[190px] rounded-md cursor-pointer"
+              >
+                <input
+                  type="submit"
+                  value="Send reset instructions"
+                  class="text-white w-full h-full cursor-pointer text-sm font-semibold"
+                />
+              </div>
+            </form>
+          </div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+{% extends '_user_edit_base.html' %}
+
+{% block accountblock %}
+    <div class='w-full h-full space-x-4 grid'>
+        {% if form.errors %}
+          <div class="space-y-2">
+            {% for field in form %} {% if field.errors %}
+            <li class="text-sm text-red-500 font-normal">
+              {{field.name}}: {{ field.errors|striptags }}
+            </li>
+            {% endif %} {% endfor %}
+          </div>
+        {% endif %}
+        <form method='post' enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+            
+            <div class="grid space-y-2 ">
+                <label for="id_location" class="text-black font-semibold text-base">username</label>
+                <input type="username" name="username" value="{{request.user.username}}" id="id_location" class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md" maxlength="150" />
+            </div>
+
+            <div class="grid space-y-2 ">
+                <label for="id_email" class="text-black font-semibold text-base">Email</label>
+                <input type="email" value="{{request.user.email}}" name="email" id="id_email" class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md" />
+            </div>
+            <div
+                class="text-center h-12 bg-[#ea4c89] w-[150px] rounded-md cursor-pointer"
+              >
+                <input
+                  type="submit"
+                  value="Save profile"
+                  class="text-white w-full h-full cursor-pointer text-sm font-semibold"
+                />
+              </div>
+            
+        </form>
+    </div>
+{% endblock accountblock %}

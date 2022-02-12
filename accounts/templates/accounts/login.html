@@ -1,0 +1,112 @@
+{% load static %} {% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Sign In | Dribble{% endblock title %}</title>
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'css/boxicons.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+  </head>
+  <body>
+    <div class="w-full h-screen flex items-center font-sans">
+      <div class="w-2/5 bg-[#f1cdd7] h-full p-14 space-y-7">
+        <h1 class="text-[#a67e8c] text-xl font-semibold">Dribble</h1>
+
+        <p class="text-[#865c6c] text-3xl font-bold">
+          Discover the world's top Designers & Creatives.
+        </p>
+      </div>
+      <div class="relative grid items-center justify-center h-full p-6 w-3/5">
+        <div class="absolute top-0 right-0 m-7">
+          <p>
+            Not a member?
+            <a href="{% url 'accounts:signup' %}" class="text-blue-400"
+              >Sign up</a
+            >
+          </p>
+        </div>
+        <div class="space-y-5 w-[400px]">
+          <h1 class="text-black text-4xl font-bold">Sign in to Dribbble</h1>
+          {% if form.errors %}
+          <div class="space-y-2">
+            {% for field in form %} {% if field.errors %}
+            <li class="text-sm text-red-500 font-normal">
+              {{ field.errors|striptags }}
+            </li>
+            {% endif %} {% endfor %}
+          </div>
+          {% else %}
+          <div class="flex items-center space-x-4">
+            <div class="p-3 bg-[#f3f3f4] text-center rounded-md">
+              <i class="bx text-lg text-[#6e6d7a] bxl-google"></i>
+            </div>
+            <div class="p-3 bg-[#f3f3f4] text-center rounded-md">
+              <i class="bx text-lg text-[#6e6d7a] bxl-twitter"></i>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="h-[1.5px] bg-[#f3f3f4] w-full"></div>
+            <div class="text-sm text-">Or</div>
+            <div class="h-[1.5px] bg-[#f3f3f4] w-full"></div>
+          </div>
+          {% endif %}
+          <div>
+            <form method="post" class="space-y-4">
+              {% csrf_token %}
+              <div class="grid space-y-2">
+                <label
+                  for="login__username"
+                  class="text-black font-semibold text-base"
+                  >Username</label
+                >
+                <input
+                  type="text"
+                  name="username"
+                  id="login__username"
+                  class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md"
+                  maxlength="150"
+                  required=""
+                />
+              </div>
+              <div class="grid space-y-2">
+                <div class="flex w-full items-center justify-between text-base">
+                  <label
+                    for="login__password"
+                    class="text-black font-semibold text-base"
+                    >Password</label
+                  >
+                  <a
+                    href="{% url 'accounts:password_reset' %}"
+                    class="text-blue-700"
+                    >Forgot password?</a
+                  >
+                </div>
+
+                <input
+                  type="password"
+                  name="password"
+                  id="login__password"
+                  class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md"
+                  required=""
+                />
+              </div>
+              <div
+                class="text-center h-12 bg-[#ea4c89] w-[150px] rounded-md cursor-pointer"
+              >
+                <input
+                  type="submit"
+                  value="submit"
+                  class="text-white w-full h-full cursor-pointer text-sm font-semibold"
+                />
+              </div>
+            </form>
+          </div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

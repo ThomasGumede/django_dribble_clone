@@ -1,0 +1,14 @@
+{% load i18n %}{% autoescape off %}
+{% blocktranslate %}Hi {{user.first_name}}, Here are your password reset instructions..{% endblocktranslate %}
+
+{% translate "A request to reset your Dribbble password has been made. If you did not make this request, simply ignore this email. If you did make this request, please reset your password:" %}
+{% block reset_link %}
+{{ protocol }}://{{ domain }}{% url 'accounts:pwd_reset_confirm' uidb64=uid token=token %}
+{% endblock %}
+{% translate 'Your username, in case you’ve forgotten:' %} {{ user.get_username }}
+
+{% translate "Thank you," %}
+
+{% blocktranslate %}The {{ site_name }} team{% endblocktranslate %}
+
+{% endautoescape %}

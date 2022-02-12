@@ -1,0 +1,130 @@
+{% load static %}
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dribble clone{% endblock title %}</title>
+    {% tailwind_preload_css %}
+    {% tailwind_css %}
+    <!-- Get poppins fonts CDN and Boxicons Icon CDN -->
+    <link href="{% static 'imgs/favicon.ico' %}" rel="icon">
+    <link rel="stylesheet" href="{% static 'css/boxicons.min.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+</head>
+<body class="font-sans">
+    <div class="min-w-full bg-white shadow-[inset_0px_-1px_0px_#f3f3f4]">
+        <div class="w-full flex items-center justify-between px-6">
+            <nav class="flex items-center">
+                <div class="">
+                    <a href="/" class="text-black text-lg font-semibold">Dribble</a>
+                </div>
+                <ul class="flex items-center space-x-3 w-full">
+                    <li class="relative flex items-center text-[#6e6d7a] text-sm font-[500] px-4">
+                        <a href="" class="text-[#6e6d7a]">Inspiration</a>
+                    </li>
+                    <li class="relative flex items-center text-[#6e6d7a] text-sm font-[500] px-4">
+                        <a href="" class="text-[#6e6d7a]">Find Work</a>
+                    </li>
+                    <li class="relative flex items-center text-[#6e6d7a] text-sm font-[500] px-4">
+                        <a href="" class="text-[#6e6d7a]">Learn Design</a>
+                    </li>
+                    <li class="relative flex items-center text-[#6e6d7a] text-sm font-[500] px-4">
+                        <a href="" class="text-[#6e6d7a]">Go Pro</a>
+                    </li>
+                    <li class="relative flex items-center text-[#6e6d7a] text-sm font-[500] px-4">
+                        <a href="" class="text-[#6e6d7a]">Marketing</a>
+                    </li>
+                    <li class="relative flex items-center text-[#6e6d7a] text-sm font-[500] px-4">
+                        <a href="" class="text-[#6e6d7a]">Hire Designers</a>
+                    </li>
+                </ul>
+            </nav>
+            <ul class="flex space-x-4 transition-all duration-500 delay-200">
+                {% if request.user.is_authenticated %}
+                    <li class="flex items-center py-4">
+                        <div class="flex items-center space-x-3 bg-[#f3f3f4] text-[#6e6d7a] text-sm p-2 rounded-md">
+                            <i class="bx bx-search "></i>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="search" placeholder="Search" class="bg-transparent w-full h-full border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md" />
+                            </form>
+                        </div>
+                    </li>
+                    <li class="flex items-center py-4 relative group transition-all duration-500 delay-200">
+                        {% if request.user.photo %}
+                           <a href="{% url 'accounts:user_details' username=request.user.username pk=request.user.pk %}"> <img src="{{request.user.photo.url}}" alt="{{request.user.username}}" class="w-10 h-10 rounded-full"/> </a>
+                        {% else %}
+                           <a href="{% url 'accounts:user_details' username=request.user.username pk=request.user.pk %}"> <div class="text-center w-10 h-10 rounded-full text-base text-white bg-blue-800"></div> </a>
+                        {% endif %}
+                        <ul class="py-8 px-9 opacity-0 hidden group-hover:block group-hover:opacity-100 transition-all duration-500 delay-200 w-56 space-y-3 text-sm font-normal absolute z-50 top-[90%] left-1/2 -translate-x-1/2 bg-white bg-clip-padding shadow-[0px_10px_50px_rgb(0_0_0_/_10%)] rounded-sm  before:site-nav">
+                            <li><a href="{% url 'accounts:user_details' username=request.user.username pk=request.user.pk %}" class="">Profile</a></li>
+                            <hr />
+                            <li><a href="{% url 'accounts:account_update' username=request.user.username pk=request.user.pk %}" class="">Edit Profile</a></li>
+                            <li><a href="{% url 'accounts:user_details' username=request.user.username pk=request.user.pk %}" class=" flex items-center"><i class="bx bxs-heart text-[#9e9ea7]"></i> My Likes</a></li>
+                            <li><a href="" class=" flex items-center"><i class='bx bxs-folder-plus text-[#9e9ea7]' ></i> My Collections</a></li>
+                            <hr />
+                            <li><a href="{% url 'accounts:user_details' username=request.user.username pk=request.user.pk %}" class="">Account Settings</a></li>
+                            <li><a href="{% url 'accounts:logout' %}" class="">Sign Out</a></li>
+                        </ul>
+                    </li>
+                    <li class="flex items-center py-4">
+                        <div class="p-3 text-sm text-center bg-[#e94989] cursor-pointer hover:opacity-50 rounded-md">
+                            <a href="{% url 'shots:create_shot' %}" class="text-white">Upload</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="flex items-center py-4">
+                        <a><i class="bx bx-search"></i></a>
+                    </li>
+                    <li class="flex items-center py-4">
+                        <a href="{% url 'accounts:login' %}" class="text-[#6e6d7a] text-sm font-[500]">Sign in </a> / <a href="{% url 'accounts:signup' %}" class="text-[#6e6d7a] text-sm font-[500]"> Sign up</a>
+
+                    </li>
+                    <li class="flex items-center py-4">
+                        <div class="p-3 text-sm text-center bg-[#e94989] cursor-pointer hover:opacity-50 rounded-md">
+                            <a href="" class="text-white">Start free project</a>
+                        </div>
+                    </li>
+                {% endif %}
+                
+            </ul>
+        </div>
+    </div>
+
+    <div class="min-w-full mt-14">
+        {% block content %}
+        {% endblock content%}
+    </div>
+
+    <footer>
+        
+    </footer>
+    <!-- Get Jquery CDN, waypoints CDN and cookie.js CDN -->
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/js.cookie.min.js' %}"></script>
+    <script src="{% static 'js/jquery.waypoints.min.js' %}"></script>
+    <script src="{% static 'js/infinite.min.js' %}"></script>
+    <script>
+        var csrftoken = Cookies.get("csrftoken");
+        console.log(csrftoken);
+        function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+        }
+        $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            }
+        },
+        })
+    </script>
+    {% block javascript %}
+        
+    {% endblock javascript %}
+</body>
+</html>

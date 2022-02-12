@@ -1,0 +1,53 @@
+{% extends '_base.html' %} 
+
+{% block title %}Account Settings | Dribble{% endblock title %} 
+
+{% block content %}
+
+<div class="grid items-center justify-center w-11/12 mx-auto space-y-14">
+  <div class="flex items-center w-full space-x-16">
+    <div class="flex items-center space-x-5">
+      {% if request.user.photo %}
+      <img
+        src="{{request.user.photo.url}}"
+        alt="{{request.user.first_name}}"
+        class="w-14 h-14 rounded-full"
+      />
+      {% else %}
+      <div
+        class="text-center w-14 h-14 rounded-full text-base text-white bg-blue-800"
+      ></div>
+      {% endif %}
+
+      <div class="space-y-3">
+        <p class="text-xl font-normal text-black">
+          {{request.user.first_name}} {{request.user.last_name}} / General
+        </p>
+        <p class="text-sm font-normal text-[#6e6d8f]">
+          Update your username and manage your account
+        </p>
+      </div>
+    </div>
+    <div class="grid items-center justify-center border-[1px] p-4 space-y-2 text-center">
+      <p class="text-black font-bold">
+        Go <span class="text-[#ea4c89]">Pro</span>
+      </p>
+      <p class="text-[#6e6d8f]">Add power features for just $5/month</p>
+    </div>
+  </div>
+  <div class="flex items-center space-x-10">
+    <div class="space-y-4 grid flex-[0.2] self-start">
+      <a href="{% url 'accounts:general_edit' request.user.username request.user.pk %}">General</a>
+      <a href="{% url 'accounts:account_update' request.user.username request.user.pk %}">Edit profile</a>
+      <a href="{% url 'accounts:password_change' %}">Password</a>
+      <a href="">Social Profiles</a>
+      <a href="">Email Notifications</a>
+      <a href="">Sessions</a>
+      <hr />
+      <a href="">Delete Account</a>
+    </div>
+    <div class="flex-[0.8]">{% block accountblock %}{% endblock accountblock %}</div>
+  </div>
+</div>
+
+{% endblock content %}

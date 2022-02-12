@@ -1,0 +1,123 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block content %}
+    <div>
+      <div class="flex items-center justify-between w-11/12 mx-auto mt-10">
+            <div class="space-y-6">
+              
+            </div>
+            
+            <div class="relative py-2 px-3 text-center rounded-md border-[1px] bg-white flex items-center justify-center space-x-2">
+                <p class="text-base font-normal">Filter</p>
+            </div>
+        </div>
+        
+    </div>
+{% endblock content %}
+
+{% block javascript %}
+    {% if request.user.is_authenticated %}
+        <script>
+            function createComment(formData) {
+              let csrfValue = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+              fetch("{% url 'shots:shot_details' shot_uuid=shot.shot_uuid %}", {
+                method: "post",
+                headers: {
+                  "X-CSRFToken": csrfValue,
+                  "X-Requested-With": "XMLHttpRequest",
+                },
+                body: formData,
+              })
+                .then(function (response) {
+                  return response.json();
+                })
+                .then(function (data) {
+                  let instance = JSON.parse(data["new_feedback"]);
+                  let fields = instance[0]["fields"];
+                  let feedbackList = document.querySelector(".feedback_list");
+                  let nofeedback = document.querySelector(".no-feedback");
+                  console.log(feedbackList);
+                  if (nofeedback) {
+                    feedbackList.removeChild(nofeedback);
+                  }
+                  feedbackList.innerHTML += `
+                              <div>
+                                <p>${fields["body"]}</p>
+                              </div>
+                          `;
+                  window.location.reload(true);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
+
+            function submitComment(e) {
+              e.preventDefault();
+              let content = document.querySelector("#id_body").value;
+              if (content) {
+                let formData = new FormData(commentForm);
+                createComment(formData);
+                $("#form-feedback").trigger("reset");
+              } else {
+                console.log("You cannot submit an empty form");
+              }
+            }
+
+            let commentForm = document.getElementById("form-feedback");
+            commentForm.addEventListener("submit", submitComment);
+
+          // delete feedback
+            $("#delete-btn").on("click", function () {
+              $.ajax({
+                url: "{% url 'actions:delete_feedback' %}",
+                data: {
+                  feedback_id: $("#delete-btn").val(),
+                  feedback_uuid: $("#delete-btn").data("uuid"),
+                },
+                dataType: "json",
+                success: function (data) {
+                  if (data.deleted) {
+                    $("#feedback-" + $("#delete-btn").val()).remove();
+                  }
+                },
+              });
+            });
+
+  // Like post
+  $("#like-btn").on("click", function (e) {
+    e.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'actions:like_shot' %}",
+      data: {
+        id: $(this).data("id"),
+        shot_uuid: $(this).data("uuid"),
+        action: $(this).data("action"),
+      },
+      dataType: "json",
+
+      success: function (data) {
+        if (data.success) {
+          var $prev_action = $("#like-btn").data("action");
+          var $prev_like = $("#like-btn").data("action");
+          var $prev_likes = parseInt($("span#total-likes").text());
+          $("#like-btn").data(
+            "action",
+            $prev_action == "like" ? "unlike" : "like"
+          );
+          $("#like-btn").text($prev_action == "like" ? "Unlike" : "Like");
+
+          $("span#total-likes").text(
+            $prev_action == "like" ? $prev_likes + 1 : $prev_likes - 1
+          );
+        } else {
+        }
+      },
+    });
+  });
+        </script>
+
+    {% endif %}
+{% endblock javascript %}

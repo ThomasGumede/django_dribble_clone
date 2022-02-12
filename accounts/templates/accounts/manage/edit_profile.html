@@ -1,0 +1,71 @@
+{% extends '_user_edit_base.html' %}
+
+{% block accountblock %}
+    <div class='w-full h-full space-x-4 grid'>
+        {% if form.errors %}
+          <div class="space-y-2">
+            {% for field in form %} {% if field.errors %}
+            <li class="text-sm text-red-500 font-normal">
+              {{field.name}}: {{ field.errors|striptags }}
+            </li>
+            {% endif %} {% endfor %}
+          </div>
+        {% endif %}
+        <form method='post' enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+            <div class="flex items-center space-x-4">
+                {% if request.user.photo %}
+                <img
+                    src="{{request.user.photo.url}}"
+                    alt="{{request.user.first_name}}"
+                    class="w-14 h-14 rounded-full"
+                />
+                {% else %}
+                <div
+                    class="text-center w-14 h-14 rounded-full text-base text-white bg-blue-800"
+                ></div>
+                
+                {% endif %}
+                <div class="relative bg-[#ea4c89] text-white p-3 rounded-md">
+                    <span class="text-sm">Upload new picture</span>
+                    <input type="file" value="{{request.user.photo}}" name="photo" id="id_photo" class="absolute top-0 right-0 m-0 p-0 cursor-pointer opacity-0" />
+                </div>
+            </div>
+            <div class="flex items-center justify-between w-full">
+                <div class="grid space-y-2 ">
+                    <label for="id_first_name" class="text-black font-semibold text-base">Name</label>
+                    <input type="text" value="{{request.user.first_name}}" name="first_name" id="id_first_name" class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md" maxlength="150" />
+                </div>
+                <div class="grid space-y-2 ">
+                    <label for="id_last_name" class="text-black font-semibold text-base">Last Name</label>
+                    <input type="text" value="{{request.user.last_name}}" name="last_name" maxlength="150" autofocus="" id="id_last_name" class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md" maxlength="150" />
+                </div>
+            </div>
+            <div class="grid space-y-2 ">
+                <label for="id_location" class="text-black font-semibold text-base">Location</label>
+                <input type="text" name="location" value="{{request.user.location}}" id="id_location" class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md" maxlength="150" />
+            </div>
+            <div class="grid space-y-2 ">
+                <label for="id_biography" class="text-black font-semibold text-base">Bio</label>
+                <textarea type="text" value="{{request.user.biography}}" name="biography" id="id_biography" class="bg-[#f3f3f4] h-32 resize-y p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md" maxlength="1150">
+
+                </textarea>
+            </div>
+
+            <div class="grid space-y-2 ">
+                <label for="id_website" class="text-black font-semibold text-base">Personal website</label>
+                <input type="url" value="{{request.user.website}}" required="false" name="website" id="id_website" class="bg-[#f3f3f4] h-12 p-3 border-none focus:border-[#f3f3f4] focus:border-[1px] focus:outline-none outline-none rounded-md" />
+            </div>
+            <div
+                class="text-center h-12 bg-[#ea4c89] w-[150px] rounded-md cursor-pointer"
+              >
+                <input
+                  type="submit"
+                  value="Save profile"
+                  class="text-white w-full h-full cursor-pointer text-sm font-semibold"
+                />
+              </div>
+            
+        </form>
+    </div>
+{% endblock accountblock %}
