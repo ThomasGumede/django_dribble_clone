@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="{% static 'css/boxicons.min.css' %}"> 
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
 </head>
-<body class="font-sans">
+<body class="font-sans relative">
     <div class="min-w-full bg-white shadow-[inset_0px_-1px_0px_#f3f3f4]">
         <div class="w-full flex items-center justify-between px-6">
             <nav class="flex items-center">
@@ -98,6 +98,25 @@
         {% block content %}
         {% endblock content%}
     </div>
+    <!-- <div class="fixed top-0  left-0 w-full h-full bg-[rgba(0,_0,_0,_0.8)] z-50 cursor-pointer">
+        <div class="transform translate-y-0 scale-100 delay-200 rounded-t-xl bg-white relative mt-10 h-[calc(100vh_-_40px)]">
+            <div class="relative">
+                <div class="py-16 px-32 transition-[padding] delay-150">
+                    <div class="flex space-y-5 flex-col items-center min-w-full w-[1122px] m-auto">
+                        <div class="max-w-[762px] w-full">
+                            
+                        </div>
+
+                    </div>
+                    <div class="absolute top-0 right-0 w-full">
+                        <div class="pt-16 pb-10 absolute right-10">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
 
     <footer>
         

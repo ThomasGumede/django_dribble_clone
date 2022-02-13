@@ -1,6 +1,6 @@
 from django.urls import path, reverse_lazy
 from .forms import UserLoginForm, PwdResetForm
-from .views import SignUpView, PwdResetConfirmView, AccountDetailsView, EditProfileView, AccountsView, GeneralView, UpdatePasswordView
+from .views import SignUpView, PwdResetConfirmView, AccountDetailsView, EditProfileView, GeneralView, UpdatePasswordView, AccountLikesView
 from django.contrib.auth.views import (
     LoginView, 
     LogoutView, 
@@ -12,7 +12,7 @@ from django.contrib.auth.views import (
 app_name = 'accounts'
 
 urlpatterns = [
-    path('', AccountsView.as_view(), name='accounts_list'),
+    
     path('login', LoginView.as_view(template_name='accounts/login.html', form_class=UserLoginForm, redirect_authenticated_user=True), name='login'),
     path('logout', LogoutView.as_view(next_page="accounts:login"), name='logout'),
     path('signup', SignUpView.as_view(), name='signup'),
@@ -35,6 +35,7 @@ urlpatterns = [
         name='password_reset_complete'
     ),
     path('<username>/<pk>', AccountDetailsView.as_view(), name='user_details'),
+    path("likes/<username>/<pk>", AccountLikesView.as_view(), name="liked_shots"),
     path('update/<username>/<pk>', EditProfileView.as_view(), name='account_update'),
     path('general/<username>/<pk>', GeneralView.as_view(), name='general_edit'),
 

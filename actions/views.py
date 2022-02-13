@@ -44,7 +44,7 @@ class LikeShot(View):
                 return JsonResponse({'success': True}, status=200)
                 
             else:
-                pass
+                return JsonResponse({"success": False}, status=500)
         else:
             return JsonResponse({"Error": True}, status=400)
 

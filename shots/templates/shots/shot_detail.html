@@ -1,89 +1,281 @@
-{% extends '_base.html' %}
-{% load static %}
+{% extends '_base.html' %} 
+{% load static %} 
 
 {% block content %}
-    <div>
-      <div class="flex items-center justify-between w-11/12 mx-auto mt-10">
-            <div class="space-y-6">
-              
+<div class="mt-20 relative space-y-12 w-11/12 h-full mx-auto">
+  <div class="flex items-center justify-between w-[765px] mx-auto">
+    <div class="flex items-center space-x-5">
+      {% if shot.user.photo %}
+      <a href="{% url 'accounts:user_details' username=shot.user.username pk=shot.user.pk %}">
+        <img src="{{shot.user.photo.url}}" alt="{{shot.user.username}}" class="w-16 h-16 rounded-full" />
+      </a>
+      {% else %}
+      <a href="{% url 'accounts:user_details' username=shot.user.username pk=shot.user.pk %}">
+        <div class="text-center w-16 h-16 rounded-full text-base text-white bg-blue-800"></div>
+      </a>
+      {% endif %}
+      <div class="space-y-2 text-black">
+        <p class="text-xl font-semibold">{{shot.title}}</p>
+        <div class="flex items-center space-x-2">
+          <div class="text-base "><a href="{% url 'accounts:user_details' username=shot.user.username pk=shot.user.pk %}" class="text-[#0d0c22]">{{shot.user.first_name}}</a></div>
+          <div class="w-2 h-2 rounded-full bg-[#9199a0]"></div>
+          {% if request.user.is_authenticated and request.user in shot.user.followers.all %}
+            <div class="text-lg text-[#9199a0] cursor-pointer" data-action="unfollow" data-user_id="{{shot.user.id}}">
+              Unfollow</div>
+          {% else %}
+            <div class="text-lg text-[#9199a0] cursor-pointer" data-action="follow" data-user_id="{{shot.user.id}}">Follow
             </div>
-            
-            <div class="relative py-2 px-3 text-center rounded-md border-[1px] bg-white flex items-center justify-center space-x-2">
-                <p class="text-base font-normal">Filter</p>
-            </div>
+          {% endif %}
+          <div class="w-2 h-2 rounded-full bg-[#9199a0]"></div>
         </div>
-        
+      </div>
     </div>
-{% endblock content %}
+    <div class="flex items-center space-x-5">
+      <div class="bg-[#9199a065] rounded-md text-center p-3 text-black text-sm">
+        <p>Save</p>
+      </div>
+      {% if request.user.is_authenticated and request.user in shot.user_like.all %}
+      <div
+        class="p-3 text-sm text-center bg-white border-[1px] border-[#e94989] cursor-pointer hover:opacity-50 rounded-md">
+        <p class="text-[#e94989]"><i class="bx bxs-heart"></i> {{shot.user_like.count}}</p>
+      </div>
+      {% else %}
+      <div class="p-3 text-sm text-center bg-[#e94989] cursor-pointer hover:opacity-50 rounded-md">
+        <p class="text-white"><i class="bx bxs-heart"></i> Like</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="flex flex-col absolute top-0 right-0 m-4 z-40 items-center translate-x-0 space-y-3">
+    {% if shot.user.photo %}
+    <a href="{% url 'accounts:user_details' username=shot.user.username pk=shot.user.pk %}"> <img
+        src="{{shot.user.photo.url}}" alt="{{shot.user.username}}" class="w-10 h-10 rounded-full" /> </a>
+    {% else %}
+    <a href="{% url 'accounts:user_details' username=shot.user.username pk=shot.user.pk %}">
+      <div class="text-center w-10 h-10 rounded-full text-base text-white bg-blue-800"></div>
+    </a>
+    {% endif %}
+    <div class="flex flex-col items-center space-y-3">
+      <button
+        class="relative group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
+        <span
+          class="absolute top-0 text-white bg-[#0d0c22] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto rounded-md p-2 mx-2 border-[1px] text-center right-full">Comments</span>
+        <i class="bx text-[#0d0c22] bxs-message"></i>
 
+        <span
+          class="block absolute z-20 -top-[6px] -right-2 min-w-[20px] text-[11px] text-center text-[#6e6d7a] py-1 border-[1px] bg-white rounded-full shadow-[0px_2px_6px_rgb(0_0_0_/_3%)]">
+          23
+        </span>
+      </button>
+      <button
+        class="relative group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
+        <span
+          class="absolute top-0 text-white bg-[#0d0c22] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto rounded-md p-2 mx-2 border-[1px] text-center right-full">Share</span>
+        <i class="bx text-[#0d0c22] bxs-share"></i>
+
+
+      </button>
+      <button
+        class="relative group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
+        <span
+          class="absolute top-0 text-white bg-[#0d0c22] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto rounded-md p-2 mx-2 border-[1px] text-center right-full">Details</span>
+        <i class="bx text-[#0d0c22] bxs-share"></i>
+      </button>
+      <button
+        class="relative group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
+        <span
+          class="absolute top-0 text-white bg-[#0d0c22] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto rounded-md p-2 mx-2 border-[1px] text-center right-full">Save</span>
+        <i class="bx text-[#0d0c22] bxs-folder-plus"></i>
+
+
+      </button>
+      <button
+        class="relative group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
+        <span
+          class="absolute top-0 text-white bg-[#0d0c22] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto rounded-md p-2 mx-2 border-[1px] text-center right-full">Like</span>
+        <i class="bx text-[#0d0c22] bxs-heart"></i>
+
+
+      </button>
+    </div>
+  </div>
+  <div class="space-y-4 w-[800px] mx-auto">
+    <div class="w-full h-[600px] rounded-xl">
+      <img src="{{shot.cover_shot.url}}" alt="{{shot.title}}" class="w-full rounded-xl h-full object-cover" />
+    </div>
+    <div class="flex items-center space-x-6 w-full mx-auto">
+      {% for img in shot.shot_files.all %}
+      <div>
+        <img src="{{img.file.url}}" alt="{{shot.shop_uuid}}" class="w-24 h-24 rounded-md" />
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-lg py-12 text-[] font-normal">
+      <article>
+        {{shot.description}}
+      </article>
+    </div>
+  </div>
+  <div class="flex items-center justify-center w-full space-x-7">
+    <div class="w-full h-[1px] bg-[#6e6d7a]"></div>
+    <div class="space-y-4 flex flex-col items-center justify-center">
+      {% if shot.user.photo %}
+      <a href="{% url 'accounts:user_details' username=shot.user.username pk=shot.user.pk %}"> <img src="{{shot.user.photo.url}}" alt="{{shot.user.username}}" class="w-16 h-16 rounded-full" /> </a>
+      {% else %}
+      <a href="">
+        <div class="text-center w-16 h-16 rounded-full text-base text-white bg-blue-800"></div>
+      </a>
+      {% endif %}
+      <p class="text-black font-normal"><a href="{% url "accounts:user_details" shot.user.username shot.user.pk %}">{{shot.user.first_name}}</a></p>
+    </div>
+    <div class="w-full h-[1px] bg-[#6e6d7a]"></div>
+  </div>
+  {% with shot_owner=shot.user %}
+  <div class="space-y-3 w-full">
+    <div class="flex items-center justify-between">
+      <p class="text-base text-black font-bold">More by {{shot_owner.first_name}} {{shot_owner.last_name}}</p>
+      <p class="text-base font-normal">
+        <a href="{% url "accounts:user_details" shot_owner.username shot_owner.pk %}" class="text-[#e94989]">View profile</a>
+      </p>
+    </div>
+    <div class="grid grid-cols-[repeat(4,_250px)] gap-7 grid-rows-[repeat(1,_200px)]">
+      {% for shot_user in shot_owner.shots.all %}
+      <div class="relative rounded-md group">
+        {% if shot_user.cover_shot.name|slice:"-3:" == 'png' or shot_user.cover_shot.name|slice:"-3:" == 'jpg' or shot_user.cover_shot.name|slice:"-3:" == 'gif' or shot_user.cover_shot.name|slice:"-4:" == 'jpeg' or shot_user.cover_shot.name|slice:"-4:" == 'webp' %}
+        <img class="w-full h-full rounded-md object-cover" src='{{shot_user.cover_shot.url}}' />
+        {% else %}
+        <video class="responsive-video" autoplay class="w-full h-full rounded-md object-cover" preload="metadata">
+          <source src="{{ shot_user.cover_shot.url }}#t=0.5" type="video/mp4">
+        </video>
+        {% endif %}
+        <div
+          class="absolute bottom-0 bg-[#000000bd] transition-all duration-500 delay-300 hidden group-hover:flex rounded-md left-0 h-16 w-full p-4  items-center justify-between">
+          <p class="text-white font-semibold text-base"><a
+              href="{% url 'shots:shot_details' shot_user.shot_uuid %}">{{shot_user.title}}</a></p>
+          <div class="flex items-center space-x-3">
+            <p class="w-7 h-7 cursor-pointer rounded-md bg-white text-[#9e9ea7] grid items-center justify-center">
+              <i class='bx bxs-folder-plus text-base'></i>
+            </p>
+            {% if request.user.is_authenticated and request.user in shot_user.user_like.all %}
+            <p class="w-7 h-7 cursor-pointer rounded-md bg-white text-[#ea4c89] grid items-center justify-center">
+              <i class="bx bxs-heart text-base"></i>
+            </p>
+            {% else %}
+            <p class="w-7 h-7 cursor-pointer rounded-md bg-white text-[#9e9ea7] grid items-center justify-center">
+              <i class="bx bxs-heart text-base"></i>
+            </p>
+            {% endif %}
+
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+  {% endwith %}
+
+</div>
+<div class="fixed top-0 transition opacity-0 hidden duration-500 delay-200 items-center justify-center left-0 bottom-0 right-0 w-full h-screen bg-[rgba(0,_0,_0,_0.8)] z-50">
+  <div class="space-y-7 transition opacity-0 duration-500 delay-200 relative w-[500px] p-7 rounded-lg bg-white">
+    <div class="space-y-2">
+      <h1 class="text-3xl font-bold text-black">Shot Details</h1>
+      <p class="text-xl">Posted {{shot.created|date}} {{shot.created|time}}</p>
+    </div>
+    <div class="flex items-center space-x-5 text-xl">
+      <div class="space-y-2">
+        <p>Views</p>
+        <p>{{shot.view_count}}</p>
+      </div>
+      <div class="space-y-2">
+        <p>Saves</p>
+        <p>{{shot.view_count}}</p>
+      </div>
+      <div class="space-y-2">
+        <p>Likes</p>
+        <p>{{shot.user_like.count}}</p>
+      </div>
+      <div class="space-y-2">
+        <p>Comments</p>
+        <p>{{shot.feedbacks.count}}</p>
+      </div>
+    </div>
+    <div class="absolute top-0 right-0 m-5 cursor-pointer text-center text-xl">
+      <p>x</p>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
 {% block javascript %}
-    {% if request.user.is_authenticated %}
-        <script>
-            function createComment(formData) {
-              let csrfValue = document.getElementsByName("csrfmiddlewaretoken")[0].value;
-              fetch("{% url 'shots:shot_details' shot_uuid=shot.shot_uuid %}", {
-                method: "post",
-                headers: {
-                  "X-CSRFToken": csrfValue,
-                  "X-Requested-With": "XMLHttpRequest",
-                },
-                body: formData,
-              })
-                .then(function (response) {
-                  return response.json();
-                })
-                .then(function (data) {
-                  let instance = JSON.parse(data["new_feedback"]);
-                  let fields = instance[0]["fields"];
-                  let feedbackList = document.querySelector(".feedback_list");
-                  let nofeedback = document.querySelector(".no-feedback");
-                  console.log(feedbackList);
-                  if (nofeedback) {
-                    feedbackList.removeChild(nofeedback);
-                  }
-                  feedbackList.innerHTML += `
+{% if request.user.is_authenticated %}
+<script>
+  function createComment(formData) {
+    let csrfValue = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+    fetch("{% url 'shots:shot_details' shot_uuid=shot.shot_uuid %}", {
+      method: "post",
+      headers: {
+        "X-CSRFToken": csrfValue,
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: formData,
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        let instance = JSON.parse(data["new_feedback"]);
+        let fields = instance[0]["fields"];
+        let feedbackList = document.querySelector(".feedback_list");
+        let nofeedback = document.querySelector(".no-feedback");
+        console.log(feedbackList);
+        if (nofeedback) {
+          feedbackList.removeChild(nofeedback);
+        }
+        feedbackList.innerHTML += `
                               <div>
                                 <p>${fields["body"]}</p>
                               </div>
                           `;
-                  window.location.reload(true);
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            }
+        window.location.reload(true);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
-            function submitComment(e) {
-              e.preventDefault();
-              let content = document.querySelector("#id_body").value;
-              if (content) {
-                let formData = new FormData(commentForm);
-                createComment(formData);
-                $("#form-feedback").trigger("reset");
-              } else {
-                console.log("You cannot submit an empty form");
-              }
-            }
+  function submitComment(e) {
+    e.preventDefault();
+    let content = document.querySelector("#id_body").value;
+    if (content) {
+      let formData = new FormData(commentForm);
+      createComment(formData);
+      $("#form-feedback").trigger("reset");
+    } else {
+      console.log("You cannot submit an empty form");
+    }
+  }
 
-            let commentForm = document.getElementById("form-feedback");
-            commentForm.addEventListener("submit", submitComment);
+  let commentForm = document.getElementById("form-feedback");
+  commentForm.addEventListener("submit", submitComment);
 
-          // delete feedback
-            $("#delete-btn").on("click", function () {
-              $.ajax({
-                url: "{% url 'actions:delete_feedback' %}",
-                data: {
-                  feedback_id: $("#delete-btn").val(),
-                  feedback_uuid: $("#delete-btn").data("uuid"),
-                },
-                dataType: "json",
-                success: function (data) {
-                  if (data.deleted) {
-                    $("#feedback-" + $("#delete-btn").val()).remove();
-                  }
-                },
-              });
-            });
+  // delete feedback
+  $("#delete-btn").on("click", function () {
+    $.ajax({
+      url: "{% url 'actions:delete_feedback' %}",
+      data: {
+        feedback_id: $("#delete-btn").val(),
+        feedback_uuid: $("#delete-btn").data("uuid"),
+      },
+      dataType: "json",
+      success: function (data) {
+        if (data.deleted) {
+          $("#feedback-" + $("#delete-btn").val()).remove();
+        }
+      },
+    });
+  });
 
   // Like post
   $("#like-btn").on("click", function (e) {
@@ -117,7 +309,6 @@
       },
     });
   });
-        </script>
+</script>
 
-    {% endif %}
-{% endblock javascript %}
+{% endif %} {% endblock javascript %}

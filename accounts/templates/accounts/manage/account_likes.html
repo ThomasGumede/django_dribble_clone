@@ -1,56 +1,8 @@
-{% extends '_base.html' %} {% block title %}{{request.user.first_name}} |
-Dribble {% endblock title %} {% block content %}
-<div class="grid items-center w-11/12 mx-auto space-y-14 mb-10">
-  <div class="flex items-center justify-self-center space-x-7">
-    {% if user.photo %}
-    <img
-      src="{{user.photo.url}}"
-      alt="{{user.first_name}}"
-      class="w-32 h-32 rounded-full"
-    />
-    {% else %}
-    <div
-      class="text-center w-32 h-32 rounded-full text-base text-white bg-blue-800"
-    ></div>
+{% extends 'accounts/manage/user_index.html' %}
 
-    {% endif %}
-
-    <div class="space-y-3">
-      <p class="text-4xl font-bold text-black">
-        {{user.first_name}} {{user.last_name}}
-      </p>
-      <p class="text-base font-normal">{{user.location}}</p>
-      <p class="text-base font-normal text-[#6e6d8f]">
-        Mobile Design, UX Design / Research, Web Design
-      </p>
-      <div class="flex items-center space-x-5">
-        <div class="text-center p-2 rounded-md border-[1px] text-base">
-          <a href="" class="text-black"> Edit profile </a>
-        </div>
-        <div class="text-center p-2 rounded-md border-[1px] text-base">
-          <a href="" class="text-black"> ... </a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="space-y-7 min-w-full">
-    <div class="space-x-6 text-base font-bold">
-      <a href="" class="text-black">Shot{{user.shots.count|pluralize}} {{user.shots.count}}</a>
-      <a href="" class="text-[#6e6d8f]">Boosted Shots 0</a>
-      <a href="" class="text-[#6e6d8f]">Collections 0</a>
-      <a href="" class="text-[#6e6d8f]">Liked Shot{{user.likes.count|pluralize}} {{user.likes.count}}</a>
-      <a href="" class="text-[#6e6d8f]">About</a>
-    </div>
-    <hr />
-    <div class="grid items-center gap-4 grid-cols-[repeat(4,_300px)] grid-rows-[repeat(1,_288px)] ">
-      <div class="text-center flex flex-col items-center justify-center space-y-5 p-5 border-dotted border-[1px] rounded-md">
-        <p class="text-2xl font-bold text-black">Upload your first shot</p>
-        <p>Show off your best work. Get feedback, likes and be a part of a growing community.</p>
-        <div class="text-center flex items-center justify-center w-36 h-14 bg-[#ea4c89] rounded-md">
-          <a href="" class="text-white">Upload Shot</a>
-        </div>
-      </div>
-      {% for content in user.shots.all %}
+{% block user_details %}
+    {% with shots=user.likes.all  %}
+        {% for content in shots %}
             <div class="infinite-item  transition-all duration-500 delay-300">
                 <div class="relative h-60 w-full rounded-md group transition-all duration-500 delay-300">
                     {% if content.cover_shot.name|slice:"-3:" == 'png' or content.cover_shot.name|slice:"-3:" == 'jpg' or content.cover_shot.name|slice:"-3:" == 'gif' or content.cover_shot.name|slice:"-4:" == 'jpeg' or content.cover_shot.name|slice:"-4:" == 'webp' %}
@@ -102,7 +54,5 @@ Dribble {% endblock title %} {% block content %}
                 </div>
             </div>
         {% endfor %}
-    </div>
-  </div>
-</div>
-{% endblock content %}
+    {% endwith %}
+{% endblock user_details %}

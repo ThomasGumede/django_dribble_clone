@@ -32,6 +32,11 @@ Dribble clone developed using django, tailwindcss and jquery/javascript.
 - uploads/new
 ![ ](docs/shots/img2.png)
 
+- shot/{shot_uuid}
+![ ](docs/shots/img3.png)
+
+![ ](docs/shots/img4.png)
+
 ## Account Register/Login/Reset password
 
 - account/login

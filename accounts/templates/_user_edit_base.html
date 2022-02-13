@@ -21,10 +21,10 @@
 
       <div class="space-y-3">
         <p class="text-xl font-normal text-black">
-          {{request.user.first_name}} {{request.user.last_name}} / General
+          {{request.user.first_name}} {{request.user.last_name}} / {% block edit_title %}General{% endblock edit_title %}
         </p>
         <p class="text-sm font-normal text-[#6e6d8f]">
-          Update your username and manage your account
+          Update your {% block text_title %}username{% endblock text_title %} and manage your account
         </p>
       </div>
     </div>

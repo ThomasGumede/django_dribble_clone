@@ -7,12 +7,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 User = get_user_model()
 # Create your views here.
-from django.views.generic import View, ListView, CreateView
+from django.views.generic import View, CreateView
 from django.views.generic.detail import DetailView
 from django.contrib import messages
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import PasswordChangeForm
+from shots.models import Shot
 
 class SignUpView(CreateView):
     template_name = 'accounts/signup.html'
@@ -26,24 +27,28 @@ class SignUpView(CreateView):
         return result
 
 
-class AccountsView(LoginRequiredMixin, ListView):
-    model = User
-    context_object_name = 'users'
-    template_name = 'users.html'
-
-class AccountDetailsView(LoginRequiredMixin, DetailView):
+class AccountDetailsView(DetailView):
     model = User
     slug_field = 'username'
     context_object_name = 'user'
     slug_url_kwarg = 'username'
     query_pk_and_slug = True
-    template_name = 'index.html'
+    template_name = 'accounts/manage/user_index.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.pk == self.get_object().pk:
-            context['update_profile_link'] = reverse_lazy('accounts:account_update', self.request.user.username, self.request.user.pk)
-        return context
+class AccountLikesView(View):
+    """
+        Displays all shots that the user liked. 
+    """
+    model = User
+    template_name = "accounts/manage/account_likes.html"
+
+    def get(self, request, username, pk, *args, **kwargs):
+        # filter shots
+        try:
+            user = self.model.objects.prefetch_related("likes").get(username=username, pk=pk)
+            return render(request, self.template_name, {"user": user})
+        except self.model.DoesNotExist:
+            pass
 
 class EditProfileView(LoginRequiredMixin, View):
     model = None
@@ -130,8 +135,6 @@ class UpdatePasswordView(LoginRequiredMixin, View):
             return redirect("accounts:password_change")
         else:
             return render(request, self.template_name, {"form": form})
-
-    
 
 class PwdResetConfirmView(PasswordResetConfirmView):
     template_name = 'accounts/password/pwd__reset_confirm.html'
