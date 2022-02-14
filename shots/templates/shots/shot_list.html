@@ -44,7 +44,11 @@
                                 <i class='bx bxs-folder-plus text-lg' ></i>
                             </p>
                             {% if request.user.is_authenticated and request.user in content.user_like.all %}
-                                <p id="like_btn_{{content.pk}}" data-action="unlike" data-uuid={{content.shot_uuid}} data-id={{content.id}} onclick="likePost('#like_btn_{{content.pk}}', '.likes-count-{{content.pk}}', '#like-btn-{{content.pk}}')" class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#ea4c89] grid items-center justify-center">
+                                <p id="like_btn_{{content.pk}}" 
+                                data-action="unlike" 
+                                data-uuid={{content.shot_uuid}} 
+                                data-id={{content.id}} 
+                                onclick="likePost('#like_btn_{{content.pk}}', '.likes-count-{{content.pk}}', '#like-btn-{{content.pk}}')" class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#ea4c89] grid items-center justify-center">
                                     <i class="bx bxs-heart text-lg"></i>
                                 </p>
                             {% else %}
@@ -131,7 +135,6 @@
     });
 
     //Like Shot
-    
     function likePost(target_id, like_count_id, style_target_id)
     {
         //this.e.preventDefault();
@@ -148,83 +151,45 @@
 
         success: function (data) {
             if (data.success) {
-                var $prev_action = $(`${target_id}`).data("action");
-                var $prev_like = $(`${target_id}`).data("action");
-                if(like_count_id){
-                   var $prev_like_count = $(`${like_count_id}`)
-                   var $prev_likes = parseInt($prev_like_count.text());
-                   $prev_like_count.text($prev_action == "like" ? $prev_likes + 1 : $prev_likes - 1)
-                   
+                AjaxRequestsExecuted(target_id, like_count_id, style_target_id)
                 }
-                
-    
-                if($prev_action == "like")
-                {
-                    $(`${target_id}`).data("action", "unlike");
-                    $(`${target_id}`).addClass("text-[#ea4c89]");
-                    if(style_target_id)
-                    {
-                         $(`${style_target_id}`).addClass("text-[#ea4c89]");
-                    }
-                    
-                }else {
-                    $(`${target_id}`).removeClass("text-[#ea4c89]");
-                    $(`${target_id}`).data("action", "like");
-                    if(style_target_id)
-                    {
-                        $(`${style_target_id}`).removeClass("text-[#ea4c89]");
-                    }
-                }
-            }else {
+            else {
                 alert("Error occured")
             }
         }
         })
     }
 
-// $(".like-btn-" + $("#like-btn").data("uuid")).on("click", function (e) {
-//     console.log($(".like-btn-" + $("#like-btn").data("uuid")))
-//     e.preventDefault();
-//     $.ajax({
-//       type: "POST",
-//       url: "{% url 'actions:like_shot' %}",
-//       data: {
-//         id: $(this).data("id"),
-//         shot_uuid: $(this).data("uuid"),
-//         action: $(this).data("action"),
-//       },
-//       dataType: "json",
+    function AjaxRequestsExecuted(target_id, like_count_id, style_target_id)
+    {
+        var $prev_action = $(`${target_id}`).data("action");
+        var $prev_like = $(`${target_id}`).data("action");
+        if(like_count_id){
+            var $prev_like_count = $(`${like_count_id}`)
+            var $prev_likes = parseInt($prev_like_count.text());
+            $prev_like_count.text($prev_action == "like" ? $prev_likes + 1 : $prev_likes - 1)
+                   
+        }
+                
+    
+        if($prev_action == "like")
+        {
+            $(`${target_id}`).data("action", "unlike");
+            $(`${target_id}`).addClass("text-[#ea4c89]");
+            if(style_target_id)
+            {
+                $(`${style_target_id}`).addClass("text-[#ea4c89]");
+            }
+                    
+        }else {
+            $(`${target_id}`).removeClass("text-[#ea4c89]");
+            $(`${target_id}`).data("action", "like");
+            if(style_target_id)
+            {
+                $(`${style_target_id}`).removeClass("text-[#ea4c89]");
+            }
+        }
+    }
 
-//       success: function (data) {
-//         if (data.success) {
-//           var $prev_action = $(this).data("action");
-//           var $prev_like = $(this).data("action");
-//           var $prev_like_count = $(".likes-count-" + $(this).data(uuid))
-//           var $prev_likes = parseInt($prev_like_count.text());
-//           if($prev_action == "like")
-//           {
-//               $(this).data("action", "unlike");
-//               $(this).addClass("text-[#ea4c89]");
-//               $prev_like_count.text($prev_likes + 1)
-//           }else {
-//               $(this).removeClass("text-[#ea4c89]");
-//               $(this).data("action", "like");
-//               $prev_like_count.text($prev_likes - 1)
-//           }
-//           //$("#like-btn").data(
-//           //  "action",
-//           //  $prev_action == "like" ? "unlike" : "like"
-//          // );
-//          // $("#like-btn").removeClass();
-
-//         //  $("span#total-likes").text(
-//          //   $prev_action == "like" ? $prev_likes + 1 : $prev_likes - 1
-//         //  );
-//         } else {
-//             alert("no")
-//         }
-//       },
-//     });
-//   }))
   </script>
 {% endblock javascript %}

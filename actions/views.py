@@ -63,7 +63,7 @@ class FollowUser(View):
                     Contact.objects.filter(user_from=request.user, user_to=user).delete()
                 return JsonResponse({"success": True}, status=200)
             else:
-                pass
+                return JsonResponse({"success": False, "message": "Can't follow yourself"})
         else:
             return JsonResponse({"success": False}, status=404)
 

@@ -34,9 +34,20 @@
           <a href="{% url 'accounts:account_update' request.user.username request.user.pk %}" class="text-black"> ... </a>
         </div>
         {% else %}
-          <div class="text-center p-2 cursor-pointer rounded-md border-[1px] text-base">
-            <a class="text-black">+ Follow </a>
+          {% if request.user in user.followers.all %}
+            <div id="follow-btn" data-action="unfollow" data-username="{{user.username}}" data-user_id="{{user.id}}" 
+            class="text-center text-[#e94989] p-2 cursor-pointer rounded-md border-[#e94989] border-[1px] text-base">
+              - Unfollow 
+            </div>
+          {% else %}
+          <div id="follow-btn" 
+            data-action="follow" 
+            data-username="{{user.username}}" 
+            data-user_id="{{user.id}}" 
+            class="text-center p-2 text-black cursor-pointer rounded-md border-[1px] text-base">
+            + Follow
           </div>
+          {% endif %}
           <div class="text-center p-2 rounded-md border-[1px] text-base">
             <a class="text-black"> ... </a>
           </div>
@@ -75,17 +86,25 @@
                         </video>
                     {% endif %}
                     <div class="absolute bottom-0 bg-[#000000bd] transition-all duration-500 delay-300 hidden group-hover:flex rounded-md left-0 h-16 w-full p-4  items-center justify-between">
-                        <p class="text-white font-semibold text-lg"><a href="{% url 'shots:shot_details' content.shot_uuid %}">{{content.title}}</a></p>
+                        <p class="text-white font-semibold text-lg">
+                            <a href="{% url 'shots:shot_details' content.shot_uuid %}">
+                                {{content.title}}
+                            </a>
+                        </p>
                         <div class="flex items-center space-x-3">
                             <p class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#9e9ea7] grid items-center justify-center">
                                 <i class='bx bxs-folder-plus text-lg' ></i>
                             </p>
                             {% if request.user.is_authenticated and request.user in content.user_like.all %}
-                                <p class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#ea4c89] grid items-center justify-center">
+                                <p id="like_btn_{{content.pk}}" 
+                                data-action="unlike" 
+                                data-uuid={{content.shot_uuid}} 
+                                data-id={{content.id}} 
+                                onclick="likePost('#like_btn_{{content.pk}}', '.likes-count-{{content.pk}}', '#like-btn-{{content.pk}}')" class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#ea4c89] grid items-center justify-center">
                                     <i class="bx bxs-heart text-lg"></i>
                                 </p>
                             {% else %}
-                                <p class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#9e9ea7] grid items-center justify-center">
+                                <p id="like_btn_{{content.pk}}" data-action="like" data-uuid={{content.shot_uuid}} data-id={{content.id}} onclick="likePost('#like_btn_{{content.pk}}', '.likes-count-{{content.pk}}', '#like-btn-{{content.pk}}')" class="w-8 h-8 cursor-pointer rounded-md bg-white text-[#9e9ea7] grid items-center justify-center">
                                     <i class="bx bxs-heart text-lg"></i>
                                 </p>
                             {% endif %}
@@ -97,20 +116,37 @@
                 <div class="flex items-center justify-between h-11">
                     <div class="flex items-center space-x-2">
                         {% if content.user.photo %}
-                            <div class="h-8 w-8 rounded-full"><img class="w-full h-full rounded-full"src='{{content.user.photo.url}}' /></div>
+                            <div class="h-8 w-8 rounded-full">
+                                <img class="w-full h-full rounded-full"src='{{content.user.photo.url}}' />
+                            </div>
                         {% else %}
                             <div class="text-center h-8 w-8 rounded-full text-base text-white bg-blue-800"></div>
                         {% endif %}
-                        <p class="cursor-pointer"><a class="text-base text-black font-normal" href='{{content.user.username}}'>{{content.user.username}}</a></p>
+                        <p class="cursor-pointer">
+                            <a class="text-base text-black font-normal" href="{% url "accounts:user_details" content.user.username content.user.pk %}">
+                                {{content.user.username}}
+                            </a>
+                        </p>
                     </div>
                     
                     <div class="flex items-center space-x-2 text-[#9e9ea7] text-lg">
                         {% if request.user.is_authenticated and request.user in content.user_like.all %}
-                        <p class="group cursor-pointer"><i class="bx bxs-heart text-[#ea4c89]"></i> <span>{{content.user_like.count}}</span></p>
+                        <p onclick="likePost('#like-btn-{{content.pk}}', '.likes-count-{{content.pk}}', '#like_btn_{{content.pk}}')" class="group cursor-pointer  text-[#ea4c89]" data-action="unlike" data-uuid={{content.shot_uuid}} data-id={{content.id}} id="like-btn-{{content.pk}}">
+                            <i class="bx bxs-heart"></i> 
+                            <span id="total-likes" class="text-[#9e9ea7] likes-count-{{content.pk}}">
+                                {{content.user_like.count}}
+                            </span>
+                        </p>
                         {% else %}
-                            <p class="group cursor-pointer"><i class="bx bxs-heart group-hover:text-[#ea4c89]"></i> <span>{{content.user_like.count}}</span></p>
+                            <p onclick="likePost('#like-btn-{{content.pk}}', '.likes-count-{{content.pk}}', '#like_btn_{{content.pk}}')" class="group cursor-pointer" data-action="like" data-uuid={{content.shot_uuid}} data-id={{content.id}} id="like-btn-{{content.pk}}">
+                                <i class="bx bxs-heart group-hover:text-[#ea4c89]"></i> 
+                                <span id="total-likes" class="text-[#9e9ea7] likes-count-{{content.pk}}">{{content.user_like.count}}</span>
+                            </p>
                         {% endif %}
-                        <p class="group cursor-pointer"><i class='bx bxs-show group-hover:text-[#ea4c89]'></i> <span>{{content.view_count}}</span></p>  
+                        <p  class="group cursor-pointer">
+                            <i class='bx bxs-show group-hover:text-[#ea4c89]'></i> 
+                            <span>{{content.view_count}}</span>
+                        </p>  
                     </div>
                     
                 </div>
@@ -121,3 +157,107 @@
   </div>
 </div>
 {% endblock content %}
+
+{% block javascript %}
+{% if request.user.is_authenticated %}
+<script>
+
+  // FOLLOW SHOT OWNER
+  $("#follow-btn").on("click", function(e){
+    e.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'actions:follow_user' %}",
+      data: {
+        user_id: $(this).data("user_id"),
+        action: $(this).data('action'),
+        username: $(this).data('username')
+      },
+      dataType: "json",
+      success: function(data){
+        if(data.success){
+          var $follow_btn = $("#follow-btn")
+          var $prev_action = $("#follow-btn").attr('data-action');
+          if($prev_action === 'follow'){
+            $follow_btn.removeClass("text-black")
+            $follow_btn.addClass("text-[#e94989] border-[#e94989]")
+
+            $follow_btn.attr("data-action", "unfollow")
+            $follow_btn.text("- Unfollow")
+          }else{
+            $follow_btn.addClass("text-black")
+            $follow_btn.removeClass("text-[#e94989] border-[#e94989]")
+
+            $follow_btn.attr("data-action", "follow")
+            $follow_btn.text("+ Follow")
+          }
+        }else{
+          alert("Something went wrong!")
+        }
+      }
+    })
+  })
+
+</script>
+{% block user_js %}
+  <script>
+    //Like Shot
+    function likePost(target_id, like_count_id, style_target_id)
+    {
+        //this.e.preventDefault();
+        
+        $.ajax({
+        type: "POST",
+        url: "{% url 'actions:like_shot' %}",
+        data: {
+            id: $(`${target_id}`).data("id"),
+            shot_uuid: $(`${target_id}`).data("uuid"),
+            action: $(`${target_id}`).data("action"),
+        },
+        dataType: "json",
+
+        success: function (data) {
+            if (data.success) {
+                AjaxRequestsExecuted(target_id, like_count_id, style_target_id)
+                }
+            else {
+                alert("Error occured")
+            }
+        }
+        })
+    }
+
+    function AjaxRequestsExecuted(target_id, like_count_id, style_target_id)
+    {
+        var $prev_action = $(`${target_id}`).data("action");
+        var $prev_like = $(`${target_id}`).data("action");
+        if(like_count_id){
+            var $prev_like_count = $(`${like_count_id}`)
+            var $prev_likes = parseInt($prev_like_count.text());
+            $prev_like_count.text($prev_action == "like" ? $prev_likes + 1 : $prev_likes - 1)
+                   
+        }
+                
+    
+        if($prev_action == "like")
+        {
+            $(`${target_id}`).data("action", "unlike");
+            $(`${target_id}`).addClass("text-[#ea4c89]");
+            if(style_target_id)
+            {
+                $(`${style_target_id}`).addClass("text-[#ea4c89]");
+            }
+                    
+        }else {
+            $(`${target_id}`).removeClass("text-[#ea4c89]");
+            $(`${target_id}`).data("action", "like");
+            if(style_target_id)
+            {
+                $(`${style_target_id}`).removeClass("text-[#ea4c89]");
+            }
+        }
+    }
+  </script>
+{% endblock user_js %}
+{% endif %}
+{% endblock javascript %}

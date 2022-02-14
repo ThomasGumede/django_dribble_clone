@@ -19,11 +19,17 @@
         <div class="flex items-center space-x-2">
           <div class="text-base "><a href="{% url 'accounts:user_details' username=shot.user.username pk=shot.user.pk %}" class="text-[#0d0c22]">{{shot.user.first_name}}</a></div>
           <div class="w-2 h-2 rounded-full bg-[#9199a0]"></div>
-          {% if request.user.is_authenticated and request.user in shot.user.followers.all %}
-            <div class="text-lg text-[#9199a0] cursor-pointer" data-action="unfollow" data-user_id="{{shot.user.id}}">
-              Unfollow</div>
+          {% if request.user.is_authenticated and request.user != shot.user %}
+            {% if request.user in shot.user.followers.all %}
+              <div id="follow-btn" class="text-lg text-[#e94989] cursor-pointer" data-action="unfollow" data-username="{{shot.user.username}}" data-user_id="{{shot.user.id}}">
+                Unfollow</div>
+            {% else %}
+              <div id="follow-btn" class="text-lg text-[#9199a0] cursor-pointer" data-action="follow" data-username="{{shot.user.username}}" data-user_id="{{shot.user.id}}">Follow
+              </div>
+            {% endif %}
           {% else %}
-            <div class="text-lg text-[#9199a0] cursor-pointer" data-action="follow" data-user_id="{{shot.user.id}}">Follow
+            <div id="follow-btn" class="text-lg text-[#9199a0] cursor-pointer" data-action="follow" data-username="{{shot.user.username}}" data-user_id="{{shot.user.id}}">
+              <a href="{% url 'accounts:user_details' request.user.username request.user.pk %}" class="">Profile</a>
             </div>
           {% endif %}
           <div class="w-2 h-2 rounded-full bg-[#9199a0]"></div>
@@ -35,14 +41,22 @@
         <p>Save</p>
       </div>
       {% if request.user.is_authenticated and request.user in shot.user_like.all %}
-      <div
-        class="p-3 text-sm text-center bg-white border-[1px] border-[#e94989] cursor-pointer hover:opacity-50 rounded-md">
-        <p class="text-[#e94989]"><i class="bx bxs-heart"></i> {{shot.user_like.count}}</p>
-      </div>
+      <button 
+      onclick="likePost('#like-btn', '#likes-count-{{shot.id}}')"
+      id="like-btn" value="unlike" data-uuid={{shot.shot_uuid}} data-id={{shot.id}}  class="p-3 like-shot-btn text-sm text-[#e94989] text-center bg-white border-[1px] border-[#e94989] cursor-pointer hover:opacity-50 rounded-md">
+        <p class="likes_count_container"><i class="bx bxs-heart"></i> <span id="likes-count-{{shot.id}}">{{shot.user_like.count}}</span></p>
+      </button>
       {% else %}
-      <div class="p-3 text-sm text-center bg-[#e94989] cursor-pointer hover:opacity-50 rounded-md">
-        <p class="text-white"><i class="bx bxs-heart"></i> Like</p>
-      </div>
+      <button 
+        onclick="likePost('#like-btn', '#likes-count-{{shot.id}}')"
+        id="like-btn"
+        value="like"
+        data-uuid={{shot.shot_uuid}}
+        data-id={{shot.id}}
+        
+        class="p-3 like-shot-btn text-sm text-center text-white bg-[#e94989] cursor-pointer hover:opacity-50 rounded-md">
+        <p class="likes_count_container"><i class="bx bxs-heart"></i> Like</p>
+      </button>
       {% endif %}
     </div>
   </div>
@@ -64,7 +78,7 @@
 
         <span
           class="block absolute z-20 -top-[6px] -right-2 min-w-[20px] text-[11px] text-center text-[#6e6d7a] py-1 border-[1px] bg-white rounded-full shadow-[0px_2px_6px_rgb(0_0_0_/_3%)]">
-          23
+          {{shot.feedbacks.count}}
         </span>
       </button>
       <button
@@ -75,11 +89,11 @@
 
 
       </button>
-      <button
+      <button id="show_details"
         class="relative group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
         <span
           class="absolute top-0 text-white bg-[#0d0c22] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto rounded-md p-2 mx-2 border-[1px] text-center right-full">Details</span>
-        <i class="bx text-[#0d0c22] bxs-share"></i>
+        <i class='bx bxs-error-circle'></i>
       </button>
       <button
         class="relative group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
@@ -89,14 +103,29 @@
 
 
       </button>
-      <button
-        class="relative group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
+      {% if request.user.is_authenticated and request.user in shot.user_like.all %}
+      <button 
+        onclick="likePost('#like-btn-{{shot.id}}', '#likes-count-{{shot.id}}')"
+        id="like-btn-{{shot.id}}" value="unlike" data-uuid="{{shot.shot_uuid}}" data-id={{shot.id}}   class="relative like-shot-btn group duration-400 border-[#e94989] bg-white text-center border-[1px] outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#e94989] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
         <span
           class="absolute top-0 text-white bg-[#0d0c22] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto rounded-md p-2 mx-2 border-[1px] text-center right-full">Like</span>
-        <i class="bx text-[#0d0c22] bxs-heart"></i>
+        <i class="bx bxs-heart"></i>
+      </button>
+      {% else %}
+      <button 
+        onclick="likePost('#like-btn-{{shot.id}}', '#likes-count-{{shot.id}}')"
+        id="like-btn-{{shot.id}}"
+        value="like"
+        data-uuid={{shot.shot_uuid}}
+        data-id={{shot.id}}
+        class="relative like-shot-btn group duration-400 bg-white text-center border-none outline-none h-10 px-3 py-2 delay-200 cursor-pointer text-sm font-medium appearance-none select-none rounded-md text-[#0d0c22] shadow-[0px_0px_0px_1px_#e7e7e9_inset]">
+        <span
+          class="absolute top-0 text-white bg-[#0d0c22] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto rounded-md p-2 mx-2 border-[1px] text-center right-full">Like</span>
+        <i class="bx bxs-heart"></i>
 
 
       </button>
+      {% endif %}
     </div>
   </div>
   <div class="space-y-4 w-[800px] mx-auto">
@@ -106,7 +135,7 @@
     <div class="flex items-center space-x-6 w-full mx-auto">
       {% for img in shot.shot_files.all %}
       <div>
-        <img src="{{img.file.url}}" alt="{{shot.shop_uuid}}" class="w-24 h-24 rounded-md" />
+        <img src="{{img.file.url}}" alt="{{shot.shot_uuid}}" class="w-24 h-24 rounded-md" />
       </div>
       {% endfor %}
     </div>
@@ -177,8 +206,8 @@
   {% endwith %}
 
 </div>
-<div class="fixed top-0 transition opacity-0 hidden duration-500 delay-200 items-center justify-center left-0 bottom-0 right-0 w-full h-screen bg-[rgba(0,_0,_0,_0.8)] z-50">
-  <div class="space-y-7 transition opacity-0 duration-500 delay-200 relative w-[500px] p-7 rounded-lg bg-white">
+<div id="details_container" class="fixed top-0 transition opacity-0 hidden duration-500 delay-200 items-center justify-center left-0 bottom-0 right-0 w-full h-screen bg-[rgba(0,_0,_0,_0.8)] z-50">
+  <div id="shot_details_holder" class="space-y-7 transition opacity-0 duration-500 delay-200 relative w-[500px] p-7 rounded-lg bg-white">
     <div class="space-y-2">
       <h1 class="text-3xl font-bold text-black">Shot Details</h1>
       <p class="text-xl">Posted {{shot.created|date}} {{shot.created|time}}</p>
@@ -209,56 +238,21 @@
 
 {% endblock content %}
 {% block javascript %}
-{% if request.user.is_authenticated %}
+
 <script>
-  function createComment(formData) {
-    let csrfValue = document.getElementsByName("csrfmiddlewaretoken")[0].value;
-    fetch("{% url 'shots:shot_details' shot_uuid=shot.shot_uuid %}", {
-      method: "post",
-      headers: {
-        "X-CSRFToken": csrfValue,
-        "X-Requested-With": "XMLHttpRequest",
-      },
-      body: formData,
-    })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        let instance = JSON.parse(data["new_feedback"]);
-        let fields = instance[0]["fields"];
-        let feedbackList = document.querySelector(".feedback_list");
-        let nofeedback = document.querySelector(".no-feedback");
-        console.log(feedbackList);
-        if (nofeedback) {
-          feedbackList.removeChild(nofeedback);
-        }
-        feedbackList.innerHTML += `
-                              <div>
-                                <p>${fields["body"]}</p>
-                              </div>
-                          `;
-        window.location.reload(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  function submitComment(e) {
+  //Toggle details_container
+  $("#show_details").on("click", function(e){
     e.preventDefault();
-    let content = document.querySelector("#id_body").value;
-    if (content) {
-      let formData = new FormData(commentForm);
-      createComment(formData);
-      $("#form-feedback").trigger("reset");
-    } else {
-      console.log("You cannot submit an empty form");
-    }
-  }
-
-  let commentForm = document.getElementById("form-feedback");
-  commentForm.addEventListener("submit", submitComment);
+    $("#details_container").removeClass("hidden opacity-0")
+    $("#shot_details_holder").removeClass("opacity-0")
+    $("#details_container").addClass("flex opacity-100")
+  })
+  $("#details_container").on("click", function(e){
+    e.preventDefault()
+    $("#details_container").addClass("hidden opacity-0")
+    $("#shot_details_holder").addClass("opacity-0")
+    $("#details_container").removeClass("flex opacity-100")
+  })
 
   // delete feedback
   $("#delete-btn").on("click", function () {
@@ -277,38 +271,110 @@
     });
   });
 
-  // Like post
-  $("#like-btn").on("click", function (e) {
+// FOLLOW SHOT OWNER
+
+  $("#follow-btn").on("click", function(e){
     e.preventDefault();
     $.ajax({
       type: "POST",
-      url: "{% url 'actions:like_shot' %}",
+      url: "{% url 'actions:follow_user' %}",
       data: {
-        id: $(this).data("id"),
-        shot_uuid: $(this).data("uuid"),
-        action: $(this).data("action"),
+        user_id: $(this).data("user_id"),
+        action: $(this).data('action'),
+        username: $(this).data('username')
       },
       dataType: "json",
+      success: function(data){
+        if(data.success){
+          var $follow_btn = $("#follow-btn")
+          var $prev_action = $("#follow-btn").attr('data-action');
+          if($prev_action === 'follow'){
+            $follow_btn.removeClass("text-[#9199a0]")
+            $follow_btn.addClass("text-[#e94989]")
 
-      success: function (data) {
-        if (data.success) {
-          var $prev_action = $("#like-btn").data("action");
-          var $prev_like = $("#like-btn").data("action");
-          var $prev_likes = parseInt($("span#total-likes").text());
-          $("#like-btn").data(
-            "action",
-            $prev_action == "like" ? "unlike" : "like"
-          );
-          $("#like-btn").text($prev_action == "like" ? "Unlike" : "Like");
+            $follow_btn.attr("data-action", "unfollow")
+            $follow_btn.text("Unfollow")
+          }else{
+            $follow_btn.addClass("text-[#9199a0]")
+            $follow_btn.removeClass("text-[#e94989]")
 
-          $("span#total-likes").text(
-            $prev_action == "like" ? $prev_likes + 1 : $prev_likes - 1
-          );
-        } else {
+            $follow_btn.attr("data-action", "follow")
+            $follow_btn.text("Follow")
+          }
+        }else{
+          alert("Something went wrong!")
         }
-      },
-    });
-  });
-</script>
+      }
+    })
+  })
+  // Like post
+  function likePost(target_id, like_count_id) {
+      //this.e.preventDefault();
+      console.log($(target_id).attr('value'))
 
-{% endif %} {% endblock javascript %}
+      $.ajax({
+        type: "POST",
+        url: "{% url 'actions:like_shot' %}",
+        data: {
+          id: $(`${target_id}`).data("id"),
+          shot_uuid: $(`${target_id}`).data("uuid"),
+          action: $(target_id).attr('value'),
+        },
+        dataType: "json",
+
+        success: function (data) {
+          if (data.success) {
+            AjaxRequestsExecuted(target_id, like_count_id)
+          }
+          else {
+            alert("Error occured")
+          }
+        }
+      })
+    }
+
+  function AjaxRequestsExecuted(target_id, like_count_id) {
+      var $prev_action = $(target_id).attr('value');
+     
+      var $shot_id = $(`${target_id}`).data("id")
+      var $like_btn_1 = $(`button#like-btn`)
+      var $like_btn_2 = $(`#like-btn-${$shot_id}`)
+      if (like_count_id) {
+        var $prev_like_count = $(`${like_count_id}`)
+        var $prev_likes = parseInt($prev_like_count.text());
+        $prev_like_count.text($prev_action == "like" ? $prev_likes + 1 : $prev_likes - 1)
+
+      }
+
+
+      if ($prev_action == "like") {
+        if ($like_btn_1.attr('value') == "like") {
+          $like_btn_1.attr("value", "unlike");
+        }else{
+          $like_btn_1.attr("value", "like");
+        }
+        $like_btn_1.attr("value", "unlike");
+        $like_btn_1.addClass("border-[#e94989] border-[1px] bg-white text-[#e94989]");
+        $like_btn_1.removeClass("text-white bg-[#e94989]");
+
+
+        $like_btn_2.attr("value", "unlike");
+        $like_btn_2.removeClass("border-none text-[#0d0c22]");
+        $like_btn_2.addClass("border-[#e94989] border-[1px] text-[#e94989]");
+        
+        
+
+      } else {
+        $like_btn_1.attr("value", "like");
+        $like_btn_1.removeClass("border-[#e94989] border-[1px] bg-white text-[#e94989]");
+        $like_btn_1.addClass("text-white bg-[#e94989]");
+
+
+        $like_btn_2.attr("value", "like");
+        $like_btn_2.addClass("border-none text-[#0d0c22]");
+        $like_btn_2.removeClass("border-[#e94989] border-[1px] text-[#e94989]");
+        
+      }
+    }
+</script>
+{% endblock javascript %}

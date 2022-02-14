@@ -128,7 +128,7 @@
     <script src="{% static 'js/infinite.min.js' %}"></script>
     <script>
         var csrftoken = Cookies.get("csrftoken");
-        console.log(csrftoken);
+        {% comment %} console.log(csrftoken); {% endcomment %}
         function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
         return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);

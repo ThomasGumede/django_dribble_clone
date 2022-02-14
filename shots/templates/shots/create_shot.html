@@ -4,9 +4,9 @@
 {% block title %}Dribble | Upload{% endblock title %}
 
 {% block content %}
-    <div class="flex flex-col items-center justify-center space-y-10">
+    <div class="flex flex-col items-center justify-center space-y-10  mb-16">
         <div class="flex items-center justify-between w-11/12 mx-auto mt-10">
-            <div class="relative py-2 px-3 text-center rounded-md border-[1px] bg-white flex items-center justify-center space-x-2">
+            <div id="reset_form" class="relative py-2 px-3 cursor-pointer text-center rounded-md border-[1px] bg-white flex items-center justify-center space-x-2">
                 <p class="text-base font-normal">Cancel</p>
             </div>
             
@@ -28,7 +28,7 @@
                 {% endfor %}
             <div>
         {% endif %}
-        <form method='post' enctype="multipart/form-data" class="space-y-4">
+        <form method='post' enctype="multipart/form-data" class="space-y-7">
             
             {% csrf_token %}
             <div>
@@ -75,6 +75,12 @@
                 </div>
             </div>
             <input type="file" name="cover_shot" id="id_cover_shot" accept="image/jpg,image/jpeg,image/pjpeg,image/png,image/apng,image/x-png,image/gif,image/webp" class="w-[0.1px] h-[0.1px] opacity-0 overflow-hidden absolute -z-[1]"> 
+            <div id="additional_files_container" class="w-full space-x-4 flex items-center">
+                <div id="additional_files" class="cursor-pointer w-full h-28 flex items-center justify-center rounded-md border-2 border-dotted text-center">
+                    <p class="text-xl text-[#ea4c89]">Add more files(Max 5 additional files)</p>
+                </div>
+            </div>
+            <input type="file" name="files" size="5" id="id_files" multiple accept="image/jpg,image/jpeg,image/pjpeg,image/png,image/apng,image/x-png,image/gif,image/webp" class="w-[0.1px] h-[0.1px] opacity-0 overflow-hidden absolute -z-[1]"/>
             <div class="grid space-y-42">
                 <label for="id_category" class="text-[#9199a0] font-semibold text-base">Shot Category</label>
                 <select name="category" required="" id="id_category" class="w-36 h-auto text-sm text-bold border-none outline-none text-[#9199a0]">
@@ -95,20 +101,11 @@
               >
                 <input
                   type="submit"
-                  value="Save profile"
+                  value="Upload shot"
                   class="text-white w-full h-full cursor-pointer text-sm font-semibold"
                 />
               </div>
-            {% comment %} {{form.as_p}}
-            <div class="field">
-                accept=".png,.jpg,.jpeg,.gif,.tif" 
-            <p class="control">
-                <button type="submit" name="action" class="button is-success">
-                Create
-                </button>
-            </p>
             
-            </div> {% endcomment %}
         </form>
     </div>
     </div>
@@ -117,12 +114,51 @@
 {% block javascript %}
 <script>
     var form_file = document.querySelector("#file_holder"),
-    shot_file = document.querySelector("#id_cover_shot")
+    shot_file = document.querySelector("#id_cover_shot"),
+    additional_files = document.querySelector("#additional_files"),
+    files = document.querySelector("#id_files"),
+    additional_files_container = document.querySelector("#additional_files_container"),
+    form = document.querySelector("form"),
+    reset_form = document.querySelector("#reset_form")
+
+    reset_form.onclick = (e) => {
+        e.preventDefault()
+        form.reset()
+        window.location.reload(true);
+    }
+
+    additional_files.addEventListener("click", () => {
+        files.click()
+    })
 
     form_file.addEventListener("click", () => {
         shot_file.click()
         
     })
+
+    files.onchange = ({target}) =>
+    {
+        if(target.files.length === 0){
+            alert("Select atleast 1 file")
+        }else{
+           if(additional_files)
+            {
+                additional_files_container.removeChild(additional_files)
+                
+                for(var i=0; i < target.files.length; i++)
+                {
+                    console.log(window.URL.createObjectURL(target.files[i]))
+                    additional_files_container.innerHTML += `
+                        <div id="additional_files" class="cursor-pointer w-28 h-28 flex items-center justify-center rounded-md border-2 border-dotted text-center">
+                            <img src="${window.URL.createObjectURL(target.files[i])}" alt="${target.files[i].name}" class="w-full h-full object-cover" />
+                        </div>
+                    ` 
+                }
+                
+            } 
+        }
+        
+    }
 
     shot_file.onchange = ({target}) =>
     {
