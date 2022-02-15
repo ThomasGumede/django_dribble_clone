@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
 </head>
 <body class="font-sans relative">
-    <div class="min-w-full bg-white shadow-[inset_0px_-1px_0px_#f3f3f4]">
+    <div id="top_nav_container" class="min-w-full bg-white shadow-[inset_0px_-1px_0px_#f3f3f4]">
         <div class="w-full flex items-center justify-between px-6">
             <nav class="flex items-center">
                 <div class="">
@@ -92,31 +92,22 @@
                 
             </ul>
         </div>
+        {% if messages %}
+            {% for message in messages %}
+                <div id="alert" class="cursor-pointer rounded-lg py-5 flex items-center justify-between w-full px-6 text-base bg-blue-100 text-blue-700 mb-3" role="alert">
+                    {{message}}
+                    <button id="cancel_alert" class="cursor-pointer text-black border-none outline-none text-xl"><i class='bx bx-x'></i></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
     </div>
 
     <div class="min-w-full mt-14">
         {% block content %}
         {% endblock content%}
     </div>
-    <!-- <div class="fixed top-0  left-0 w-full h-full bg-[rgba(0,_0,_0,_0.8)] z-50 cursor-pointer">
-        <div class="transform translate-y-0 scale-100 delay-200 rounded-t-xl bg-white relative mt-10 h-[calc(100vh_-_40px)]">
-            <div class="relative">
-                <div class="py-16 px-32 transition-[padding] delay-150">
-                    <div class="flex space-y-5 flex-col items-center min-w-full w-[1122px] m-auto">
-                        <div class="max-w-[762px] w-full">
-                            
-                        </div>
 
-                    </div>
-                    <div class="absolute top-0 right-0 w-full">
-                        <div class="pt-16 pb-10 absolute right-10">
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
 
     <footer>
         
@@ -128,7 +119,6 @@
     <script src="{% static 'js/infinite.min.js' %}"></script>
     <script>
         var csrftoken = Cookies.get("csrftoken");
-        {% comment %} console.log(csrftoken); {% endcomment %}
         function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
         return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
@@ -140,6 +130,14 @@
             xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             }
         },
+        })
+
+        $("#cancel_alert").on("click", function(e){
+            e.preventDefault();
+            
+                $("#alert").remove()
+            
+
         })
     </script>
     {% block javascript %}

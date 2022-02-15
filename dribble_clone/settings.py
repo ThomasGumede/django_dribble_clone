@@ -11,10 +11,18 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MESSAGE_TAGS = {
+    messages.DEBUG: 'bg-gray-300 text-gray-800',
+    messages.INFO: 'bg-blue-100 text-blue-700',
+    messages.SUCCESS: 'bg-green-100 text-green-700',
+    messages.WARNING: 'bg-yellow-100 text-yellow-700',
+    messages.ERROR: 'bg-red-100 text-red-700',
+ }
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/

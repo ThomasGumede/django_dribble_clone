@@ -31,6 +31,10 @@
             <div id="follow-btn" class="text-lg text-[#9199a0] cursor-pointer" data-action="follow" data-username="{{shot.user.username}}" data-user_id="{{shot.user.id}}">
               <a href="{% url 'accounts:user_details' request.user.username request.user.pk %}" class="">Profile</a>
             </div>
+            <div class="w-2 h-2 rounded-full bg-[#9199a0]"></div>
+            <div id="delete-btn" class="text-lg text-[#9199a0] cursor-pointer">
+              <a href="{% url 'shots:delete_shot' shot.shot_uuid %}" class="">Delete Shot</a>
+            </div>
           {% endif %}
           <div class="w-2 h-2 rounded-full bg-[#9199a0]"></div>
         </div>
@@ -253,9 +257,31 @@
     $("#shot_details_holder").addClass("opacity-0")
     $("#details_container").removeClass("flex opacity-100")
   })
+  //Delete Shot
+  $("#delete-btn").on("click", function(e){
+    e.preventDefault()
+    if(confirm("Are you sure you want to delete this shot"))
+    {
+      
+      $.ajax({
+        type: "POST",
+        url: $("#delete-btn a").attr("href"),
+        data: {},
+        dataType: 'json',
+        success: function(data){
+          if(data.success){
+            window.location = data.url
+          }else {
+            window.location = data.url
+          }
+        }
+      })
+    }
+  })
+  
 
   // delete feedback
-  $("#delete-btn").on("click", function () {
+  $("#delete-btn-feedback").on("click", function () {
     $.ajax({
       url: "{% url 'actions:delete_feedback' %}",
       data: {

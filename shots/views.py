@@ -1,19 +1,22 @@
 from typing import Dict, Any
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponseServerError, HttpResponseRedirect
+from django.http import HttpResponseServerError, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import View, DeleteView
+from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch
-
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from shots.models import Shot, ShotFile, ShotCategory
 from shots.forms import ShotForm
 from actions.forms import FeedbackForm
 from actions.views import CreateFeedbackView
 from actions.models import Feedback
+
 
 
 class ShotListView(View):
@@ -80,7 +83,7 @@ class CreateShotView(LoginRequiredMixin, View):
     template_name = 'shots/create_shot.html'
 
     def get(self, request, *args, **kwargs):
-        print("someone called me")
+        
         return render(request, 'shots/create_shot.html', {'form': self.form_class})
 
     def post(self, request, *args, **kwargs):
@@ -101,24 +104,36 @@ class CreateShotView(LoginRequiredMixin, View):
                     pass
             else:
                 return HttpResponseServerError()
-
+            messages.success(request, "Shot was created successfully")
             return redirect('shots:shot_details', shot_uuid=shot.shot_uuid)
 
         else:
+            messages.error(request, "Something is missing, please fix below errors")
             return render(request, 'shots/create_shot.html', {'form': form})
 
-class DeleteShotView(LoginRequiredMixin, DeleteView):
+class DeleteShotView(LoginRequiredMixin, SingleObjectMixin, View):
     slug_field = 'shot_uuid'
     slug_url_kwarg = 'shot_uuid'
-    template_name = 'shots/delete_shot.html'
     model = Shot
     success_url = reverse_lazy('shots:shot_list')
+    deleted = False
     
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        success_url = self.get_success_url()
+    def delete(self, request):
+        self.object = self.get_object()     
         if self.object.user == request.user:
-            self.object.delete()
-            return HttpResponseRedirect(success_url)
+            self.object.delete()     
+            self.deleted = True
         else:
-            return HttpResponseServerError()
+            self.deleted = False
+
+    def post(self, request, shot_uuid, *args, **kwargs):
+        self.delete(request)
+        if self.deleted:
+            messages.success(request, "Shot was deleted successfully")
+            return JsonResponse({"success": True, "url": self.success_url}, status=200)
+        else:
+            messages.error(request, "Something isn't right")
+            messages.warning(request, "You tried deleting someone ele\'s shot, You blocked")
+            get_object_or_404(User, username=request.user.username).delete()
+
+            return JsonResponse({"success": False, "url": reverse_lazy("accounts:signup")}, status=500)

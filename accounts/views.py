@@ -1,8 +1,9 @@
+from email import message
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib.auth import update_session_auth_hash
 from django.urls.base import reverse_lazy
-from .forms import RegistrationForm, PwdResetConfirmForm, AccountUpdateForm, GeneralEditForm
+from .forms import RegistrationForm, PwdResetConfirmForm, AccountUpdateForm, GeneralEditForm, PwdResetForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 User = get_user_model()
@@ -10,7 +11,7 @@ User = get_user_model()
 from django.views.generic import View, CreateView
 from django.views.generic.detail import DetailView
 from django.contrib import messages
-from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth.views import PasswordResetConfirmView, PasswordResetView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import PasswordChangeForm
 from shots.models import Shot
@@ -19,11 +20,17 @@ class SignUpView(CreateView):
     template_name = 'accounts/signup.html'
     form_class = RegistrationForm
 
+    def form_invalid(self, form):
+        result = super().form_valid(form)
+        messages.error(self.request, "Something isn\'t, please fix below errors")
+        return result
+
     def form_valid(self, form):
         result = super().form_valid(form)
         cd = form.cleaned_data
         user = authenticate(username=cd['username'], password=cd['password1'])
         login(self.request, user)
+        messages.success(self.request, "Account created successfully")
         return result
 
 
@@ -80,10 +87,10 @@ class EditProfileView(LoginRequiredMixin, View):
             self.model.website = cd["website"]
             self.model.biography = cd["biography"]
             self.model.save(update_fields=["first_name", "last_name", "website", "biography", "location", "photo"])
-            
+            messages.success(request, "Account updated successfully")
             return redirect("accounts:account_update", username=self.model.username, pk=self.model.pk)
         else:
-            print(form.errors)
+            messages.error(request, "Something isn\'t right, please fix below errors")
             return render(request, self.template_name, {"form": form})
     
 class GeneralView(LoginRequiredMixin, View):
@@ -112,10 +119,10 @@ class GeneralView(LoginRequiredMixin, View):
             self.model.username = cd["username"]
             self.model.email = cd["email"]
             self.model.save(update_fields=["username", "email"])
-            
+            messages.success(request, "Username or email updated successfully")
             return redirect("accounts:general_edit", username=self.model.username, pk=self.model.pk)
         else:
-            
+            messages.error(request, "Error receives, please fix all below errors")
             return render(request, self.template_name, {"form": form})
 
 class UpdatePasswordView(LoginRequiredMixin, View):
@@ -131,12 +138,35 @@ class UpdatePasswordView(LoginRequiredMixin, View):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
-            messages.success(request, 'Your password was successfully updated!')
+            messages.success(request, 'Your password was successfully updated')
             return redirect("accounts:password_change")
         else:
+            messages.error(request, 'Error receives, please fix all below errors')
             return render(request, self.template_name, {"form": form})
 
 class PwdResetConfirmView(PasswordResetConfirmView):
     template_name = 'accounts/password/pwd__reset_confirm.html'
-    success_url = reverse_lazy('accounts:password_reset_complete')
+    success_url = reverse_lazy('accounts:login')
     form_class=PwdResetConfirmForm
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Something isn\'t right, please fix below errors")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Password reset successfully")
+        return super().form_valid(form)
+
+class PwdResetView(PasswordResetView):
+    template_name='accounts/password/pwd__reset_form.html'
+    form_class=PwdResetForm
+    success_url=reverse_lazy("accounts:login")
+    email_template_name="accounts/password/pwd__reset_email.html"
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Something isn\'t right, please fix below errors")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Email sent with password reset instructions")
+        return super().form_valid(form)
